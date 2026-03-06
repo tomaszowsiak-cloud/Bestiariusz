@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bio-Ekspert v3.3 // Skaner Warunków</title>
+<title>Bio-Ekspert v3.4 // Pełna Diagnostyka</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -179,15 +179,29 @@
 
   @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  .card-header { display: flex; gap: 12px; align-items: center; }
+  .card-header { display: flex; gap: 12px; align-items: center; cursor: pointer; }
   .bact-icon {
     width: 44px; height: 44px; background: var(--accent-dim);
     border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px;
   }
   .bact-info { flex: 1; }
   .bact-info h3 { font-size: 15px; color: var(--text-bright); margin-bottom: 2px; }
+  .bact-info p { font-size: 11px; color: var(--text-dim); }
   .status-tag { font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
   .status-high { background: rgba(255,82,102,0.1); color: var(--red); }
+  .status-med { background: rgba(255,159,67,0.1); color: var(--orange); }
+  .status-low { background: rgba(46,204,113,0.1); color: var(--green); }
+
+  .expanded { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); }
+  .expanded.open { display: block; }
+
+  .detail-section { margin-bottom: 12px; }
+  .detail-section h4 { font-size: 10px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px; }
+  .detail-section p { font-size: 13px; line-height: 1.5; }
+
+  .bullet-list { list-style: none; margin-top: 5px; }
+  .bullet-list li { font-size: 13px; margin-bottom: 4px; padding-left: 15px; position: relative; color: var(--text); }
+  .bullet-list li::before { content: "•"; position: absolute; left: 0; color: var(--accent); font-weight: bold; }
 
   /* FILTERS */
   .filter-scroll {
@@ -206,7 +220,7 @@
   /* MATRIX */
   .matrix-container { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
   .matrix-table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 12px; }
-  .matrix-table th { background: var(--border); padding: 10px; color: var(--text-dim); text-align: left; }
+  .matrix-table th { background: var(--border); padding: 10px; color: var(--text-dim); text-align: left; white-space: nowrap; }
   .matrix-table td { padding: 10px; border-bottom: 1px solid var(--border); }
   .matrix-table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
 
@@ -239,7 +253,7 @@
 
 <main class="main-content">
 
-  <!-- VIEW: SCANNER (NEW) -->
+  <!-- VIEW: SCANNER -->
   <section id="view-scan" class="section active">
     <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 20px;">Wybierz warunki panujące na oczyszczalni, aby zidentyfikować możliwe gatunki nitkowate:</p>
     
@@ -285,12 +299,20 @@
       <div class="chip active" onclick="filterBact('all', this)">Wszystkie</div>
       <div class="chip" onclick="filterBact('pienienie', this)">Pienienie</div>
       <div class="chip" onclick="filterBact('puchnięcie', this)">Puchnięcie</div>
+      <div class="chip" onclick="filterBact('tłuszcze', this)">Tłuszcze</div>
+      <div class="chip" onclick="filterBact('siarka', this)">Septyczność</div>
+      <div class="chip" onclick="filterBact('tlen', this)">Niski Tlen</div>
+      <div class="chip" onclick="filterBact('fm', this)">Niskie F/M</div>
     </div>
     <div id="bacteria-list"></div>
   </section>
 
   <!-- VIEW: MATRIX -->
   <section id="view-matrix" class="section">
+    <div style="display: flex; gap: 12px; margin-bottom: 12px; font-size: 11px; color: var(--text-dim); font-weight: 700;">
+      <span>● Silne powiązanie</span>
+      <span>— Brak</span>
+    </div>
     <div class="matrix-container">
       <table class="matrix-table" id="matrix-table"></table>
     </div>
@@ -303,23 +325,25 @@ const data = [
   {
     id: 'nocardia',
     name: 'Nocardia spp. (NALO)',
-    alias: 'Prawdziwe rozgałęzienia',
+    alias: 'Organizmy podobne do Nocardia',
     icon: '🌿',
     danger: 'high',
     tags: ['pienienie', 'tłuszcze', 'lato'],
-    causes: ['Tłuszcze (FOG)', 'Długi wiek osadu', 'Ciepłe ścieki'],
-    action: ['Usuwanie piany', 'Skrócenie SRT'],
+    morph: 'Bakterie Gram-dodatnie (+). Jako jedyne w osadzie czynnym wykazują prawdziwe rozgałęzienia (kształt litery Y lub T). Posiadają hydrofobowe ściany komórkowe, ułatwiające asymilację lipidów.',
+    causes: ['Wysokie stężenie tłuszczów, olejów i smarów (FOG)', 'Długi wiek osadu (SRT > 15-20 dni)', 'Wyższe temperatury ścieków (> 15°C)'],
+    action: ['Mechaniczne usuwanie piany z powierzchni (nie recyrkulować)', 'Redukcja wieku osadu (skrócenie SRT)', 'Separacja tłuszczu na dopływie'],
     color: '#ff5266'
   },
   {
     id: 'microthrix',
     name: 'Microthrix parvicella',
-    alias: 'Spaghetti / Mata',
+    alias: 'Mata Spaghetti',
     icon: '🍝',
     danger: 'high',
     tags: ['pienienie', 'puchnięcie', 'tłuszcze', 'zima', 'fm'],
-    causes: ['Zima / Zimno', 'Tłuszcze (LCFA)', 'Niskie F/M'],
-    action: ['Skrócenie SRT', 'Sole glinu'],
+    morph: 'Bakteria Gram-dodatnia (+). Nitki przypominają splątaną matę spaghetti. Barwi się dodatnio metodą Neissera (niebieskie granulki PHB). Brak pochwy i rozgałęzień.',
+    causes: ['Niskie temperatury (zima, < 12°C)', 'Długołańcuchowe kwasy tłuszczowe (LCFA)', 'Długi wiek osadu', 'Niskie obciążenie ładunkiem (F/M)'],
+    action: ['Skrócenie wieku osadu', 'Dawkowanie soli glinu (np. PAX)', 'Stosowanie selektora beztlenowego'],
     color: '#00f2ff'
   },
   {
@@ -329,8 +353,9 @@ const data = [
     icon: '🪣',
     danger: 'high',
     tags: ['puchnięcie', 'biogeny_n', 'siarka'],
-    causes: ['Brak Azotu', 'Septyczność (H2S)', 'VFA'],
-    action: ['Dawkowanie mocznika'],
+    morph: 'Grube, Gram-ujemne (-) nitki o beczułkowatych lub dyskowatych komórkach. Wystają promieniście z kłaczków do cieczy nadosadowej. Wykazują ruch ślizgający.',
+    causes: ['Niedobór azotu (BZT:N < 100:5)', 'Septyczność ścieków (siarczki, kwasy organiczne)', 'Przeciążenia organiczne (pulsy ładunku)'],
+    action: ['Dawkowanie azotu (mocznik, RSM)', 'Eliminacja septyczności (napowietrzanie ścieków surowych)', 'Selektor tlenowy'],
     color: '#ff5266'
   },
   {
@@ -340,41 +365,69 @@ const data = [
     icon: '⚡',
     danger: 'med',
     tags: ['puchnięcie', 'tlen', 'siarka'],
-    causes: ['Siarczki (H2S)', 'Niskie DO'],
-    action: ['Napowietrzanie'],
+    morph: 'Gram-ujemne (-) nitki z prostokątnymi komórkami. Pochwa obecna. Magazynują siarkę wewnątrz komórek w postaci błyszczących granulek (perły). Często tworzą rozety.',
+    causes: ['Obecność siarczków (zagniłe ścieki)', 'Deficyt tlenu rozpuszczonego (DO < 1.0 mg/l)', 'Kwasy lotne na dopływie'],
+    action: ['Poprawa natlenienia w reaktorze', 'Dawkowanie soli żelaza do strącania siarczków', 'Selektor tlenowy'],
     color: '#2ecc71'
   },
   {
     id: 'type0041',
-    name: 'Type 0041 / 0675',
-    alias: 'Porośle Epifityczne',
+    name: 'Type 0041',
+    alias: 'Porośle Epifityczne (Grube)',
     icon: '🌾',
     danger: 'low',
     tags: ['fm'],
-    causes: ['Niskie F/M', 'Stary osad'],
-    action: ['Zwiększenie obciążenia'],
+    morph: 'Nitki o zmiennym barwieniu Grama. Kwadratowe komórki. Charakterystyczne silne porośle epifityczne (attached growth) przytwierdzone do powierzchni nitki.',
+    causes: ['Niskie obciążenie osadu ładunkiem (Niskie F/M)', 'Długi wiek osadu (stary osad)'],
+    action: ['Zwiększenie obciążenia F/M (zmniejszenie masy osadu)', 'Zwiększenie częstotliwości usuwania osadu nadmiernego'],
+    color: '#94a3b8'
+  },
+  {
+    id: 'type0675',
+    name: 'Type 0675',
+    alias: 'Porośle Epifityczne (Cienkie)',
+    icon: '🎋',
+    danger: 'low',
+    tags: ['fm'],
+    morph: 'Bardzo podobny do Type 0041, ale o mniejszej średnicy nitek. Kwadratowe komórki z obfitym poroślem epifitycznym (wyglądają jak "broda").',
+    causes: ['Niskie obciążenie osadu ładunkiem (Niskie F/M)', 'Wysoki stopień stabilizacji osadu'],
+    action: ['Zwiększenie obciążenia F/M', 'Regulacja wieku osadu'],
     color: '#94a3b8'
   },
   {
     id: 'sphaerotilus',
     name: 'Sphaerotilus natans',
-    alias: 'Fałszywe rozgałęzienia',
+    alias: 'Bakteria Ściekowa',
     icon: '🌭',
     danger: 'high',
     tags: ['puchnięcie', 'tlen', 'lato'],
-    causes: ['Bardzo niski tlen', 'Wysokie BZT'],
-    action: ['Silne napowietrzanie'],
+    morph: 'Gram-ujemne (-) nitki. Komórki w kształcie pręcików/kiełbasek wewnątrz wyraźnej pochwy. Wykazują fałszywe rozgałęzienia (wynik wyślizgania się komórek).',
+    causes: ['Bardzo niskie stężenie tlenu (DO < 0.5 mg/l)', 'Silne przeciążenie łatwo przyswajalnymi cukrami (wysokie BZT)', 'Niedobór mikroelementów (Fe, Mn)'],
+    action: ['Intensywne napowietrzanie', 'Kontrola ładunku organicznego na dopływie', 'Selektor kontaktowy'],
+    color: '#ff9f43'
+  },
+  {
+    id: 'type1701',
+    name: 'Type 1701',
+    alias: 'Pokrewna Sphaerotilus',
+    icon: '🥖',
+    danger: 'high',
+    tags: ['puchnięcie', 'tlen'],
+    morph: 'Gram-ujemne (-). Komórki pałeczkowate z wyraźną otoczką (pochwą). Morfologia zbliżona do S. natans, ale bez fałszywych rozgałęzień.',
+    causes: ['Chroniczny niedobór tlenu rozpuszczonego', 'Niskie stężenia tlenu przy wysokim obciążeniu organicznym'],
+    action: ['Zwiększenie natlenienia w całej objętości reaktora', 'Weryfikacja sprawności dyfuzorów'],
     color: '#ff9f43'
   },
   {
     id: 'type0092',
     name: 'Type 0092',
-    alias: 'Letni nitkowiec',
+    alias: 'Letni odpowiednik Microthrix',
     icon: '☀️',
     danger: 'med',
     tags: ['tłuszcze', 'lato', 'fm'],
-    causes: ['Ciepło (>18°C)', 'Tłuszcze', 'Długi SRT'],
-    action: ['Skrócenie SRT'],
+    morph: 'Krótkie, proste lub wygięte nitki. Gram-ujemne (-), ale dodatnie w metodzie Neissera. Rosną zazwyczaj wewnątrz kłaczków, rzadko wystają na zewnątrz.',
+    causes: ['Wysokie temperatury ścieków (> 18°C)', 'Obecność tłuszczów (FOG)', 'Długi wiek osadu i niskie obciążenie F/M'],
+    action: ['Skrócenie wieku osadu', 'Kontrola separatorów tłuszczu latem', 'Zwiększenie obciążenia osadu'],
     color: '#ffcc00'
   },
   {
@@ -384,19 +437,33 @@ const data = [
     icon: '📍',
     danger: 'med',
     tags: ['tlen'],
-    causes: ['Niskie DO (chronicznie)'],
-    action: ['Zwiększenie DO > 2'],
+    morph: 'Gram-ujemne (-). Bardzo cienkie, krótkie i proste nitki. Wyglądają jak igły jeża lub wykałaczki wystające promieniście z kłaczka.',
+    causes: ['Precyzyjny wskaźnik chronicznego niedotlenienia (DO < 1.0 mg/l)', 'Występuje w stabilnych systemach przy spadkach tlenu'],
+    action: ['Zwiększenie napowietrzania (utrzymanie DO > 2.0 mg/l)', 'Regulacja stężenia osadu'],
     color: '#bf5af2'
+  },
+  {
+    id: 'type1851',
+    name: 'Type 1851',
+    alias: 'Pęczki nitek',
+    icon: '🔩',
+    danger: 'low',
+    tags: ['fm'],
+    morph: 'Gram-ujemne (-). Nitki tworzą charakterystyczne pęczki. Budowa podobna do 0041, ale komórki są bardziej cylindryczne.',
+    causes: ['Bardzo niskie obciążenie osadu (F/M)', 'Bardzo długi wiek osadu (stary, zmineralizowany osad)'],
+    action: ['Skrócenie wieku osadu', 'Zwiększenie dopływu świeżego ładunku'],
+    color: '#94a3b8'
   },
   {
     id: 'nostocoida',
     name: 'Nostocoida limicola',
-    alias: 'Korale',
+    alias: 'Korale / Kulki na sznurku',
     icon: '🫧',
     danger: 'med',
-    tags: ['pienienie', 'biogeny_n', 'biogeny_p'],
-    causes: ['Brak Fosforu/Azotu', 'Kwasy lotne'],
-    action: ['Biogeny'],
+    tags: ['pienienie', 'puchnięcie', 'biogeny_n', 'biogeny_p'],
+    morph: 'Gram-dodatnie (+) lub zmienne. Skręcone nitki zbudowane z owalnych komórek przypominających korale. Neisser-dodatnie (fioletowe).',
+    causes: ['Niedobory azotu lub fosforu', 'Obecność kwasów lotnych (VFA)', 'Ścieki z przemysłu spożywczego/fermentacyjnego'],
+    action: ['Uzupełnienie nutrientów (N i P)', 'Korekta pH', 'Kontrola dopływu kwasów organicznych'],
     color: '#64c8ff'
   }
 ];
@@ -436,18 +503,29 @@ function runScanner() {
 
   resultDiv.innerHTML = matches.map(b => `
     <div class="card">
-      <div class="card-header">
+      <div class="card-header" onclick="toggleCard('${b.id}')">
         <div class="bact-icon">${b.icon}</div>
         <div class="bact-info">
           <h3>${b.name}</h3>
           <p>${b.alias} • Dopasowanie: ${Math.round((b.score / activeScannerTags.size) * 100)}%</p>
         </div>
-        <div class="status-tag ${b.score === activeScannerTags.size ? 'status-high' : ''}">
+        <div class="status-tag status-${b.danger}">
           ${b.score === activeScannerTags.size ? 'IDEALNE' : 'MOŻLIWE'}
         </div>
       </div>
-      <div style="margin-top:10px; font-size:12px; color:var(--text-dim)">
-        <strong>Główny powód:</strong> ${b.causes.join(', ')}
+      <div class="expanded" id="exp-${b.id}">
+        <div class="detail-section">
+          <h4>🔬 Morfologia</h4>
+          <p>${b.morph}</p>
+        </div>
+        <div class="detail-section">
+          <h4>⚡ Przyczyny</h4>
+          <ul class="bullet-list">${b.causes.map(c => `<li>${c}</li>`).join('')}</ul>
+        </div>
+        <div class="detail-section">
+          <h4>💊 Leczenie</h4>
+          <ul class="bullet-list">${b.action.map(a => `<li>${a}</li>`).join('')}</ul>
+        </div>
       </div>
     </div>
   `).join('');
@@ -461,12 +539,13 @@ function switchView(view, btn) {
   document.getElementById('view-' + view).classList.add('active');
   btn.classList.add('active');
   document.getElementById('current-view-title').innerText = '// ' + view.toUpperCase();
+  if (view === 'diag') renderCatalog();
 }
 
 function toggleSettings() { document.getElementById('accessMenu').classList.toggle('open'); }
 function toggleTheme() { document.body.classList.toggle('light-mode'); }
 function adjustFont(delta) {
-  currentFontSize = Math.max(14, Math.min(22, currentFontSize + delta));
+  currentFontSize = Math.max(14, Math.min(24, currentFontSize + delta));
   document.documentElement.style.setProperty('--base-font-size', currentFontSize + 'px');
 }
 
@@ -479,31 +558,52 @@ function filterBact(tag, el) {
 function renderCatalog(tag = 'all') {
   const list = document.getElementById('bacteria-list');
   list.innerHTML = data.filter(b => tag === 'all' || b.tags.includes(tag)).map(b => `
-    <div class="card" onclick="this.querySelector('.expanded').classList.toggle('open')">
-      <div class="card-header">
+    <div class="card">
+      <div class="card-header" onclick="toggleCard('${b.id}')">
         <div class="bact-icon">${b.icon}</div>
-        <div class="bact-info"><h3>${b.name}</h3><p>${b.alias}</p></div>
+        <div class="bact-info">
+          <h3>${b.name}</h3>
+          <p>${b.alias}</p>
+        </div>
+        <div class="status-tag status-${b.danger}">${b.danger === 'high' ? 'KRYTYCZNE' : 'ISTOTNE'}</div>
       </div>
-      <div class="expanded" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--border)">
-        <p style="font-size:13px">${b.morph}</p>
+      <div class="expanded" id="exp-${b.id}">
+        <div class="detail-section">
+          <h4>🔬 Morfologia</h4>
+          <p>${b.morph}</p>
+        </div>
+        <div class="detail-section">
+          <h4>⚡ Przyczyny</h4>
+          <ul class="bullet-list">${b.causes.map(c => `<li>${c}</li>`).join('')}</ul>
+        </div>
+        <div class="detail-section">
+          <h4>💊 Leczenie</h4>
+          <ul class="bullet-list">${b.action.map(a => `<li>${a}</li>`).join('')}</ul>
+        </div>
       </div>
     </div>
   `).join('');
 }
 
+function toggleCard(id) {
+  const exp = document.getElementById(`exp-${id}`);
+  if (exp) exp.classList.toggle('open');
+}
+
 function renderMatrix() {
   const table = document.getElementById('matrix-table');
-  const headers = ['Gatunek', 'Tlen ↓', 'FOG', 'F/M ↓', 'H2S'];
+  const headers = ['Gatunek', 'Tlen ↓', 'FOG', 'F/M ↓', 'H2S', 'N/P ↓'];
   let html = '<thead><tr>';
   headers.forEach(h => html += `<th>${h}</th>`);
   html += '</tr></thead><tbody>';
   data.forEach(b => {
     html += `<tr>
       <td style="font-weight:800; color:${b.color}">${b.icon} ${b.name.split(' ')[0]}</td>
-      <td>${b.tags.includes('tlen') ? '●' : '—'}</td>
-      <td>${b.tags.includes('tłuszcze') ? '●' : '—'}</td>
-      <td>${b.tags.includes('fm') ? '●' : '—'}</td>
-      <td>${b.tags.includes('siarka') ? '●' : '—'}</td>
+      <td style="text-align:center">${b.tags.includes('tlen') ? '<span style="color:var(--accent)">●</span>' : '—'}</td>
+      <td style="text-align:center">${b.tags.includes('tłuszcze') ? '<span style="color:var(--accent)">●</span>' : '—'}</td>
+      <td style="text-align:center">${b.tags.includes('fm') ? '<span style="color:var(--accent)">●</span>' : '—'}</td>
+      <td style="text-align:center">${b.tags.includes('siarka') ? '<span style="color:var(--accent)">●</span>' : '—'}</td>
+      <td style="text-align:center">${(b.tags.includes('biogeny_n') || b.tags.includes('biogeny_p')) ? '<span style="color:var(--accent)">●</span>' : '—'}</td>
     </tr>`;
   });
   table.innerHTML = html;
