@@ -2,1299 +2,514 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diagnostyka Bakterii Nitkowatych — Osad Czynny</title>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.cdnfonts.com/css/open-dyslexic">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Bio-Ekspert v3.3 // Skaner Warunków</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0e14;
-    --surface: #111620;
-    --surface2: #161d2a;
-    --border: #1e2d45;
-    --accent: #00b8d4;
-    --accent2: #ff6b35;
-    --accent3: #7fff6a;
-    --accent4: #ffcc00;
-    --accent5: #d966ff;
-    --text: #c8d8e8;
-    --text-dim: #5a7a99;
-    --text-bright: #eaf4ff;
-    --red: #ff4455;
-    --orange: #ff9944;
-    --yellow: #ffdd44;
-    --green: #44ff88;
-    --teal: #00ccaa;
-    --purple: #aa66ff;
-    --pink: #ff44aa;
+    --bg: #0b0f17;
+    --surface: #161c26;
+    --surface-hover: #1e2633;
+    --border: #2a3444;
+    --accent: #00f2ff;
+    --accent-dim: rgba(0, 242, 255, 0.12);
+    --text: #cbd5e1;
+    --text-bright: #ffffff;
+    --text-dim: #94a3b8;
+    
+    --red: #ff5266;
+    --orange: #ff9f43;
+    --green: #2ecc71;
+    --purple: #bf5af2;
+    --yellow: #ffcc00;
+    
+    --base-font-size: 16px;
+    --line-height: 1.6;
+    --safe-area-bottom: env(safe-area-inset-bottom);
   }
 
-  body.light {
-    --bg: #f0f4f8;
+  body.light-mode {
+    --bg: #fdfcf8;
     --surface: #ffffff;
-    --surface2: #e8eef5;
-    --border: #c5d5e8;
-    --accent: #0077aa;
-    --accent2: #d94f1a;
-    --accent3: #1a7a1a;
-    --accent4: #a07800;
-    --accent5: #7733bb;
-    --text: #1a2e42;
-    --text-dim: #5a7a99;
-    --text-bright: #0a1828;
-    --red: #cc1122;
-    --orange: #c06010;
-    --yellow: #886600;
-    --green: #1a7a3a;
-    --teal: #007755;
-    --purple: #6633cc;
-    --pink: #cc1177;
+    --surface-hover: #f1f5f9;
+    --border: #e2e8f0;
+    --accent: #0077cc;
+    --accent-dim: rgba(0, 119, 204, 0.08);
+    --text: #334155;
+    --text-bright: #0f172a;
+    --text-dim: #64748b;
   }
 
-  /* CONTROLS BAR */
-  .controls-bar {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 8px 40px;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  .ctrl-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-dim);
-  }
-  .ctrl-label { white-space: nowrap; font-weight: 500; }
-  .theme-toggle {
-    display: flex;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    overflow: hidden;
-    gap: 2px;
-    padding: 2px;
-  }
-  .theme-btn {
-    padding: 4px 12px;
-    border: none;
-    background: none;
-    color: var(--text-dim);
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 16px;
-    transition: all 0.2s;
-    display: flex; align-items: center; gap: 5px;
-  }
-  .theme-btn.active { background: var(--accent); color: #fff; }
-  .font-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--border);
-    outline: none;
-    cursor: pointer;
-  }
-  .font-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
-    border: 2px solid var(--surface);
-  }
-  .font-size-display {
-    font-size: 12px;
-    color: var(--accent);
-    font-weight: 600;
-    min-width: 32px;
-    text-align: center;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Lexend', sans-serif;
-    font-size: 14px;
-    line-height: 1.8;
-    letter-spacing: 0.02em;
-    word-spacing: 0.08em;
-    min-height: 100vh;
-    transition: background 0.3s, color 0.3s, font-family 0.2s;
-  }
-
-  body.dyslexic {
-    font-family: 'OpenDyslexic', 'Lexend', sans-serif;
-    line-height: 2.0;
-    letter-spacing: 0.05em;
-    word-spacing: 0.15em;
-  }
-  body.dyslexic .card-summary,
-  body.dyslexic .diag-value,
-  body.dyslexic .cause-list li,
-  body.dyslexic .treatment-list li,
-  body.dyslexic .cond-species,
-  body.dyslexic table.matrix td {
-    font-size: 1.05em;
-  }
-
-  /* HEADER */
-  .header {
-    background: linear-gradient(135deg, #0a1628 0%, #1a3a60 50%, #091220 100%);
-    transition: background 0.3s;
-    border-bottom: 1px solid var(--border);
-    padding: 28px 40px 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '';
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .header-tag {
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-  .header h1 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 26px;
-    color: var(--text-bright);
-    line-height: 1.2;
-  }
-  .header h1 span { color: var(--accent); }
-  .header-sub {
-    color: var(--text-dim);
-    font-size: 11px;
-    margin-top: 8px;
-  }
-
-  /* TABS */
-  .tabs {
-    display: flex;
-    gap: 0;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 40px;
-    overflow-x: auto;
-  }
-  .tab-btn {
-    padding: 14px 22px;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: var(--text-dim);
     font-family: 'Inter', sans-serif;
+    line-height: var(--line-height);
+    font-size: var(--base-font-size);
+    transition: background 0.3s, color 0.3s;
+    padding-bottom: calc(85px + var(--safe-area-bottom));
+    overflow-x: hidden;
   }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active {
+
+  /* TOP HEADER */
+  .app-bar {
+    padding: 20px 24px;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .app-bar h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: calc(var(--base-font-size) * 1.1);
+    font-weight: 800;
+    color: var(--text-bright);
+  }
+  .app-bar h1 span { color: var(--accent); }
+
+  /* FAB SETTINGS */
+  .fab-settings {
+    width: 40px; height: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+
+  .access-menu {
+    position: fixed; top: 75px; right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 16px; border-radius: 16px;
+    display: none; flex-direction: column; gap: 12px;
+    z-index: 1001; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  .access-menu.open { display: flex; }
+
+  /* BOTTOM NAVIGATION */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: calc(70px + var(--safe-area-bottom));
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around; align-items: center;
+    padding-bottom: var(--safe-area-bottom);
+    z-index: 1000;
+  }
+
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center;
+    color: var(--text-dim); text-decoration: none;
+    font-size: 10px; font-weight: 600; gap: 4px;
+    background: none; border: none; cursor: pointer;
+  }
+  .nav-item.active { color: var(--accent); }
+  .nav-item i { font-size: 22px; }
+
+  /* CONTENT AREA */
+  .main-content { padding: 20px 24px; }
+
+  /* SCANNER UI */
+  .scanner-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .scan-toggle {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+  }
+
+  .scan-toggle.active {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    box-shadow: 0 0 15px var(--accent-dim);
+  }
+
+  .scan-toggle i { font-size: 24px; font-style: normal; }
+  .scan-toggle span { font-size: 11px; font-weight: 700; color: var(--text-bright); }
+  .scan-toggle small { font-size: 9px; color: var(--text-dim); }
+
+  .scan-results-title {
+    font-size: 12px;
+    font-weight: 800;
     color: var(--accent);
-    border-bottom-color: var(--accent);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  /* MAIN */
-  .main { padding: 30px 40px; max-width: 1400px; margin: 0 auto; }
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-dim);
+    font-size: 13px;
+    border: 2px dashed var(--border);
+    border-radius: 20px;
+  }
 
-  /* SECTION */
+  /* CARDS */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 16px; margin-bottom: 12px;
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card-header { display: flex; gap: 12px; align-items: center; }
+  .bact-icon {
+    width: 44px; height: 44px; background: var(--accent-dim);
+    border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px;
+  }
+  .bact-info { flex: 1; }
+  .bact-info h3 { font-size: 15px; color: var(--text-bright); margin-bottom: 2px; }
+  .status-tag { font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
+  .status-high { background: rgba(255,82,102,0.1); color: var(--red); }
+
+  /* FILTERS */
+  .filter-scroll {
+    display: flex; overflow-x: auto; gap: 8px;
+    padding: 0 0 20px; scrollbar-width: none;
+  }
+  .filter-scroll::-webkit-scrollbar { display: none; }
+  .chip {
+    white-space: nowrap; padding: 8px 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 50px; color: var(--text-dim);
+    font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .chip.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+  /* MATRIX */
+  .matrix-container { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+  .matrix-table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 12px; }
+  .matrix-table th { background: var(--border); padding: 10px; color: var(--text-dim); text-align: left; }
+  .matrix-table td { padding: 10px; border-bottom: 1px solid var(--border); }
+  .matrix-table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+
   .section { display: none; }
   .section.active { display: block; }
 
-  /* ===== DIAGNOSTIC CARDS ===== */
-  .cards-intro {
-    color: var(--text-dim);
-    font-size: 11px;
-    letter-spacing: 1px;
-    margin-bottom: 24px;
-    border-left: 2px solid var(--accent);
-    padding-left: 12px;
-  }
-  .cards-intro span { color: var(--text); }
-
-  .filter-bar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-  }
-  .filter-btn {
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text-dim);
-    font-family: 'Inter', sans-serif;
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .filter-btn:hover, .filter-btn.active {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 20px;
-  }
-
-  .bact-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-    transition: transform 0.2s, border-color 0.2s;
-    cursor: pointer;
-  }
-  .bact-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent);
-  }
-  .bact-card.expanded { border-color: var(--accent2); }
-
-  .card-header {
-    padding: 16px 20px;
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    border-bottom: 1px solid var(--border);
-  }
-  .card-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    flex-shrink: 0;
-  }
-  .card-name {
-    flex: 1;
-  }
-  .card-name h3 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 15px;
-    color: var(--text-bright);
-    line-height: 1.2;
-  }
-  .card-name .card-alias {
-    font-size: 10px;
-    color: var(--text-dim);
-    margin-top: 2px;
-    letter-spacing: 0.5px;
-  }
-  .danger-badge {
-    padding: 3px 8px;
-    border-radius: 2px;
-    font-size: 9px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-  .danger-high { background: rgba(255,68,85,0.15); color: var(--red); border: 1px solid rgba(255,68,85,0.3); }
-  .danger-med  { background: rgba(255,153,68,0.15); color: var(--orange); border: 1px solid rgba(255,153,68,0.3); }
-  .danger-low  { background: rgba(68,255,136,0.1); color: var(--green); border: 1px solid rgba(68,255,136,0.2); }
-
-  .card-summary {
-    padding: 12px 20px;
-    font-size: 12px;
-    color: var(--text-dim);
-    border-bottom: 1px solid var(--border);
-    line-height: 1.5;
-  }
-
-  .card-quick {
-    padding: 10px 20px;
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .quick-tag {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 2px;
-    letter-spacing: 0.5px;
-  }
-  .qt-temp { background: rgba(0,229,255,0.1); color: var(--accent); }
-  .qt-season { background: rgba(255,204,0,0.1); color: var(--accent4); }
-  .qt-problem { background: rgba(255,107,53,0.1); color: var(--accent2); }
-  .qt-special { background: rgba(127,255,106,0.1); color: var(--accent3); }
-
-  .card-expand-btn {
-    width: 100%;
-    padding: 8px;
-    background: none;
-    border: none;
-    border-top: 1px solid var(--border);
-    color: var(--text-dim);
-    font-family: 'Inter', sans-serif;
-    font-size: 10px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: color 0.15s, background 0.15s;
-    text-transform: uppercase;
-  }
-  .card-expand-btn:hover { background: var(--surface2); color: var(--accent); }
-
-  .card-detail {
-    display: none;
-    padding: 0 20px 20px;
-    animation: fadeSlide 0.25s ease;
-  }
-  .card-detail.open { display: block; }
-
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .detail-section {
-    margin-top: 16px;
-  }
-  .detail-section h4 {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 10px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .diag-row {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 6px;
-    align-items: flex-start;
-  }
-  .diag-label {
-    font-size: 10px;
-    color: var(--accent);
-    white-space: nowrap;
-    min-width: 90px;
-    padding-top: 2px;
-  }
-  .diag-value {
-    font-size: 12px;
-    color: var(--text);
-    line-height: 1.4;
-  }
-
-  .cause-list, .treatment-list {
-    list-style: none;
-  }
-  .cause-list li, .treatment-list li {
-    padding: 5px 0 5px 14px;
-    position: relative;
-    font-size: 12px;
-    color: var(--text);
-    line-height: 1.4;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-  }
-  .cause-list li::before {
-    content: '▸';
-    position: absolute;
-    left: 0;
-    color: var(--accent2);
-  }
-  .treatment-list li::before {
-    content: '✦';
-    position: absolute;
-    left: 0;
-    color: var(--accent3);
-    font-size: 9px;
-    top: 7px;
-  }
-  .treatment-list li.urgent::before { color: var(--red); }
-  .treatment-list li.urgent { color: var(--text-bright); }
-
-  .coexist-tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    font-size: 10px;
-    color: var(--accent5);
-    margin: 2px;
-    background: rgba(170,102,255,0.07);
-  }
-
-  /* ===== CO-OCCURRENCE MAP ===== */
-  .map-container {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 24px;
-    margin-bottom: 24px;
-  }
-  .map-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--text-bright);
-    margin-bottom: 6px;
-  }
-  .map-sub {
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-bottom: 24px;
-  }
-
-  #cooccurrence-svg {
-    width: 100%;
-    display: block;
-    overflow: visible;
-  }
-
-  .condition-blocks {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-    margin-top: 24px;
-  }
-  .cond-block {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 14px 16px;
-  }
-  .cond-block h4 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 600;
-    font-size: 13px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .cond-icon { font-size: 16px; }
-  .cond-species {
-    font-size: 11px;
-    color: var(--text-dim);
-    line-height: 1.8;
-  }
-  .cond-species span {
-    display: inline-block;
-    padding: 1px 6px;
-    border-radius: 2px;
-    margin: 2px;
-    font-style: italic;
-  }
-
-  /* ===== MATRIX ===== */
-  .matrix-wrap {
-    overflow-x: auto;
-    margin-top: 24px;
-  }
-  table.matrix {
-    border-collapse: collapse;
-    font-size: 11px;
-    min-width: 700px;
-    width: 100%;
-  }
-  table.matrix th {
-    padding: 8px 10px;
-    background: var(--surface2);
-    color: var(--text-dim);
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  table.matrix td {
-    padding: 8px 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    vertical-align: top;
-  }
-  table.matrix tr:hover td { background: rgba(255,255,255,0.02); }
-  .m-name { color: var(--text-bright); font-style: italic; font-weight: 700; white-space: nowrap; }
-  .m-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    display: inline-block;
-    margin: 1px;
-  }
-  .m-yes { background: var(--accent); }
-  .m-maybe { background: var(--accent4); opacity: 0.7; }
-  .m-no { background: var(--border); }
-  .matrix-legend {
-    display: flex;
-    gap: 16px;
-    margin-top: 12px;
-    font-size: 10px;
-    color: var(--text-dim);
-  }
-  .ml-item { display: flex; align-items: center; gap: 6px; }
-
-  /* ===== TOOLTIP ===== */
-  .tooltip {
-    position: fixed;
-    background: var(--surface2);
-    border: 1px solid var(--accent);
-    border-radius: 3px;
-    padding: 10px 14px;
-    font-size: 11px;
-    color: var(--text);
-    pointer-events: none;
-    z-index: 1000;
-    max-width: 240px;
-    line-height: 1.5;
-    display: none;
-  }
-  .tooltip.visible { display: block; }
-
-  /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-  @media(max-width:600px) {
-    .main { padding: 20px 16px; }
-    .header { padding: 20px 16px 16px; }
-    .tabs { padding: 0 16px; }
-    .cards-grid { grid-template-columns: 1fr; }
-  }
 </style>
 </head>
-<body class="light">
+<body class="dark-mode">
 
-<div class="header">
-  <div class="header-tag">// Narzędzie diagnostyczne · Osad Czynny · v1.0</div>
-  <h1>Bakterie <span>Nitkowate</span><br>— Klucz Diagnostyczny</h1>
-  <div class="header-sub">Klasyfikacja wg. Eikelbooma · 10 głównych morfotypów · Mapa współwystępowania</div>
-</div>
+<header class="app-bar">
+  <h1>Bio<span>Ekspert</span> <small id="current-view-title" style="font-size:10px; font-weight:400; opacity:0.6; margin-left:8px;">// Skaner</small></h1>
+  <div class="fab-settings" onclick="toggleSettings()">⚙️</div>
+</header>
 
-<div class="controls-bar">
-  <div class="ctrl-group">
-    <span class="ctrl-label">Motyw:</span>
-    <div class="theme-toggle">
-      <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')">🌙 Ciemny</button>
-      <button class="theme-btn active" id="btn-light" onclick="setTheme('light')">☀️ Jasny</button>
-    </div>
-  </div>
-  <div class="ctrl-group">
-    <span class="ctrl-label">Czcionka:</span>
-    <div class="theme-toggle">
-      <button class="theme-btn active" id="btn-lexend" onclick="setFont('lexend')">Aa Lexend</button>
-      <button class="theme-btn" id="btn-dyslexic" onclick="setFont('dyslexic')">Aa OpenDyslexic</button>
-    </div>
-  </div>
-  <div class="ctrl-group">
-    <span class="ctrl-label">Rozmiar:</span>
-    <span style="font-size:11px;color:var(--text-dim)">A</span>
-    <input type="range" class="font-slider" id="font-slider" min="11" max="20" value="14" oninput="setFontSize(this.value)">
-    <span style="font-size:16px;color:var(--text-dim)">A</span>
-    <span class="font-size-display" id="font-size-display">14px</span>
+<div class="access-menu" id="accessMenu">
+  <span style="font-size: 10px; font-weight: 800; color: var(--text-dim)">DOSTĘPNOŚĆ</span>
+  <button class="chip" onclick="toggleTheme()" style="width:100%">🌓 Tryb Jasny/Ciemny</button>
+  <div style="display:flex; gap:8px;">
+    <button class="chip" onclick="adjustFont(-1)" style="flex:1">A-</button>
+    <button class="chip" onclick="adjustFont(1)" style="flex:1">A+</button>
   </div>
 </div>
 
-<div class="tabs">
-  <button class="tab-btn active" onclick="showTab('diagnoza')">🔬 Diagnoza gatunków</button>
-  <button class="tab-btn" onclick="showTab('mapa')">🕸 Mapa współwystępowania</button>
-  <button class="tab-btn" onclick="showTab('matryca')">📊 Matryca warunków</button>
-</div>
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="switchView('scan', this)"><i>📡</i><span>Skaner</span></button>
+  <button class="nav-item" onclick="switchView('diag', this)"><i>🔬</i><span>Katalog</span></button>
+  <button class="nav-item" onclick="switchView('matrix', this)"><i>📊</i><span>Matryca</span></button>
+</nav>
 
-<div class="main">
+<main class="main-content">
 
-<!-- ===== TAB 1: DIAGNOZA ===== -->
-<div id="tab-diagnoza" class="section active">
-  <div class="cards-intro">
-    Kliknij kartę aby rozwinąć pełną diagnostykę. Filtruj według problemu eksploatacyjnego. <span>Łącznie: 10 morfotypów.</span>
-  </div>
-  <div class="filter-bar">
-    <button class="filter-btn active" onclick="filterCards('all', this)">Wszystkie</button>
-    <button class="filter-btn" onclick="filterCards('pienienie', this)">Pienienie</button>
-    <button class="filter-btn" onclick="filterCards('puchnięcie', this)">Puchnięcie osadu</button>
-    <button class="filter-btn" onclick="filterCards('FOG', this)">Tłuszcze (FOG)</button>
-    <button class="filter-btn" onclick="filterCards('siarka', this)">Septyczność/Siarka</button>
-    <button class="filter-btn" onclick="filterCards('niskie F/M', this)">Niskie F/M</button>
-  </div>
-  <div class="cards-grid" id="cards-grid"></div>
-</div>
-
-<!-- ===== TAB 2: MAPA ===== -->
-<div id="tab-mapa" class="section">
-  <div class="map-container">
-    <div class="map-title">Mapa Współwystępowania Gatunków</div>
-    <div class="map-sub">Linie łączą gatunki, które często pojawiają się razem — bo spełniają się dla nich te same warunki środowiskowe. Grubość linii = siła powiązania.</div>
-    <svg id="cooccurrence-svg" viewBox="0 0 800 480"></svg>
-  </div>
-
-  <div class="condition-blocks">
-    <div class="cond-block">
-      <h4><span class="cond-icon">❄️</span> Niska temperatura + Stary osad</h4>
-      <div class="cond-species">
-        <span style="background:rgba(0,229,255,0.1);color:#00e5ff">Microthrix parvicella</span>
-        <span style="background:rgba(170,102,255,0.1);color:#aa66ff">Type 0092</span>
-        <span style="background:rgba(255,107,53,0.1);color:#ff6b35">Nocardia spp.</span>
+  <!-- VIEW: SCANNER (NEW) -->
+  <section id="view-scan" class="section active">
+    <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 20px;">Wybierz warunki panujące na oczyszczalni, aby zidentyfikować możliwe gatunki nitkowate:</p>
+    
+    <div class="scanner-grid">
+      <div class="scan-toggle" onclick="toggleScan('tlen', this)">
+        <i>☁️</i><span>Niski Tlen</span><small>DO < 1.0 mg/l</small>
       </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:8px">M. parvicella dominuje zimą. Type 0092 preferuje ciepło, ale przy długim SRT pojawiają się razem.</div>
-    </div>
-    <div class="cond-block">
-      <h4><span class="cond-icon">🧈</span> Wysokie stężenie FOG (tłuszcze)</h4>
-      <div class="cond-species">
-        <span style="background:rgba(255,107,53,0.1);color:#ff6b35">Nocardia spp.</span>
-        <span style="background:rgba(0,229,255,0.1);color:#00e5ff">Microthrix parvicella</span>
-        <span style="background:rgba(255,204,0,0.1);color:#ffcc00">Type 0092</span>
+      <div class="scan-toggle" onclick="toggleScan('tłuszcze', this)">
+        <i>🧈</i><span>Tłuszcze/FOG</span><small>Kuchnia/Przemysł</small>
       </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:8px">Wszystkie trzy gatunki mają hydrofobowe ściany komórkowe ułatwiające asymilację lipidów.</div>
-    </div>
-    <div class="cond-block">
-      <h4><span class="cond-icon">💀</span> Septyczność + Siarczki</h4>
-      <div class="cond-species">
-        <span style="background:rgba(127,255,106,0.1);color:#7fff6a">Thiothrix spp.</span>
-        <span style="background:rgba(255,68,85,0.1);color:#ff4455">Type 021N</span>
-        <span style="background:rgba(100,200,255,0.1);color:#64c8ff">Beggiatoa*</span>
+      <div class="scan-toggle" onclick="toggleScan('zima', this)">
+        <i>❄️</i><span>Zima / Zimno</span><small>Temp < 12°C</small>
       </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:8px">Zagniłe ścieki z siarczkami = idealne warunki dla bakterii siarkowych. Klasyczne trio.</div>
-    </div>
-    <div class="cond-block">
-      <h4><span class="cond-icon">📉</span> Niskie obciążenie F/M</h4>
-      <div class="cond-species">
-        <span style="background:rgba(0,204,170,0.1);color:#00ccaa">Type 0041</span>
-        <span style="background:rgba(0,204,170,0.1);color:#00ccaa">Type 0675</span>
-        <span style="background:rgba(255,68,170,0.1);color:#ff44aa">Type 1851</span>
-        <span style="background:rgba(0,229,255,0.1);color:#00e5ff">Microthrix parvicella</span>
+      <div class="scan-toggle" onclick="toggleScan('lato', this)">
+        <i>☀️</i><span>Lato / Ciepło</span><small>Temp > 18°C</small>
       </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:8px">Klasyczna „czwórka biedy" przy niedociążeniu: wolna kinetyka wzrostu, efektywne wyłapywanie substratów śladowych.</div>
-    </div>
-    <div class="cond-block">
-      <h4><span class="cond-icon">⬇️</span> Niedotlenienie (DO &lt; 1 mg/L)</h4>
-      <div class="cond-species">
-        <span style="background:rgba(127,255,106,0.1);color:#7fff6a">Thiothrix spp.</span>
-        <span style="background:rgba(217,102,255,0.1);color:#d966ff">Haliscomenobacter hydrossis</span>
-        <span style="background:rgba(255,153,68,0.1);color:#ff9944">Sphaerotilus natans</span>
-        <span style="background:rgba(255,153,68,0.1);color:#ff9944">Type 1701</span>
+      <div class="scan-toggle" onclick="toggleScan('fm', this)">
+        <i>📉</i><span>Niskie F/M</span><small>Niedociążenie</small>
       </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:8px">H. hydrossis to precyzyjny detektor deficytu tlenu. Thiothrix i Sphaerotilus dołączają przy pogłębionym niedotlenieniu.</div>
-    </div>
-    <div class="cond-block">
-      <h4><span class="cond-icon">🧪</span> Niedobór biogenów (N i P)</h4>
-      <div class="cond-species">
-        <span style="background:rgba(255,68,85,0.1);color:#ff4455">Type 021N</span>
-        <span style="background:rgba(0,204,170,0.1);color:#00ccaa">Type 0041</span>
-        <span style="background:rgba(255,68,170,0.1);color:#ff44aa">Nostocoida limicola</span>
+      <div class="scan-toggle" onclick="toggleScan('siarka', this)">
+        <i>💀</i><span>Septyczność</span><small>H2S / Zapach</small>
       </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:8px">Type 021N to silny wskaźnik niedoboru azotu. Nostocoida reaguje na deficyt N, P i obecność kwasów lotnych.</div>
+      <div class="scan-toggle" onclick="toggleScan('biogeny_n', this)">
+        <i>🧪</i><span>Brak Azotu</span><small>Deficyt N</small>
+      </div>
+      <div class="scan-toggle" onclick="toggleScan('biogeny_p', this)">
+        <i>🫧</i><span>Brak Fosforu</span><small>Deficyt P</small>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- ===== TAB 3: MATRYCA ===== -->
-<div id="tab-matryca" class="section">
-  <div class="map-container">
-    <div class="map-title">Matryca Warunków → Gatunki</div>
-    <div class="map-sub">Które warunki sprzyjają którym gatunkom — szybki klucz diagnostyczny dla operatora.</div>
-    <div class="matrix-wrap">
-      <table class="matrix" id="matrix-table"></table>
+    <div class="scan-results-title">
+      <span>🔍 Wynik analizy</span>
     </div>
-    <div class="matrix-legend">
-      <div class="ml-item"><span class="m-dot m-yes"></span> silne powiązanie</div>
-      <div class="ml-item"><span class="m-dot m-maybe"></span> umiarkowane</div>
-      <div class="ml-item"><span class="m-dot m-no"></span> brak</div>
+
+    <div id="scan-results">
+      <div class="empty-state">Wybierz parametry powyżej, aby rozpocząć skanowanie osadu.</div>
     </div>
-  </div>
-</div>
+  </section>
 
-</div><!-- /main -->
+  <!-- VIEW: CATALOG -->
+  <section id="view-diag" class="section">
+    <div class="filter-scroll">
+      <div class="chip active" onclick="filterBact('all', this)">Wszystkie</div>
+      <div class="chip" onclick="filterBact('pienienie', this)">Pienienie</div>
+      <div class="chip" onclick="filterBact('puchnięcie', this)">Puchnięcie</div>
+    </div>
+    <div id="bacteria-list"></div>
+  </section>
 
-<div class="tooltip" id="tooltip"></div>
+  <!-- VIEW: MATRIX -->
+  <section id="view-matrix" class="section">
+    <div class="matrix-container">
+      <table class="matrix-table" id="matrix-table"></table>
+    </div>
+  </section>
+
+</main>
 
 <script>
-// ========== DATA ==========
-const bacteria = [
+const data = [
   {
     id: 'nocardia',
-    name: 'Nocardia spp.',
-    alias: '+ organizmy podobne (NALO)',
+    name: 'Nocardia spp. (NALO)',
+    alias: 'Prawdziwe rozgałęzienia',
     icon: '🌿',
-    color: '#ff6b35',
     danger: 'high',
-    dangerLabel: 'KRYTYCZNY',
-    tags: ['pienienie', 'FOG'],
-    season: 'Cały rok',
-    temp: 'Cieplejsze warunki',
-    problem: 'Pienienie, gęsta piana',
-    special: 'Prawdziwe rozgałęzienia',
-    summary: 'Jedyne bakterie w osadzie z prawdziwymi rozgałęzieniami. Hydrofobowe ściany komórkowe = doskonała asymilacja tłuszczów. Tworzą gęstą, brązową pianę na reaktorze.',
-    morphology: [
-      { label: 'Forma', value: 'Rozgałęzione strzępki z prawdziwymi rozgałęzieniami (cecha unikalna)' },
-      { label: 'Barwienie', value: 'Gram-dodatnie, wyraźnie Gram(+) ze ziarnem' },
-      { label: 'Ruch', value: 'Brak' },
-      { label: 'Ściana komórkowa', value: 'Hydrofobowa — kluczowa dla patologii' },
-      { label: 'Pod mikroskopem', value: 'Gałęziaste twory przypominające koralowce lub mchy' },
-    ],
-    causes: [
-      'Wysokie stężenie tłuszczów, olejów i smarów (FOG) w ściekach — dopływ z gastronomii, ubojni, mleczarni',
-      'Długi wiek osadu (SRT > 15–20 dni)',
-      'Wyższe temperatury ścieków (> 15°C)',
-      'Ciągły, stabilny dopływ lipidów i kwasów tłuszczowych',
-      'Brak selekcji w układzie — brak stresorów eliminujących Nocardia',
-    ],
-    treatment: [
-      { urgent: true, text: 'Mechaniczne usuwanie piany z powierzchni reaktora (nie recyrkulować!)' },
-      { urgent: false, text: 'Redukcja SRT — skrócenie wieku osadu poniżej wartości krytycznej dla Nocardia' },
-      { urgent: false, text: 'Preaeracja lub flotacja tłuszczów na dopływie (separator FOG)' },
-      { urgent: false, text: 'Selektywna recyrkulacja z warstwą piany (nie wracać piany do reaktora)' },
-      { urgent: false, text: 'Dezynfekcja chlorem lub H₂O₂ (dawkowanie selektywne na pianę)' },
-      { urgent: false, text: 'Zwiększenie obciążenia osadu (wzrost F/M) — zmiana kinetyki wzrostu' },
-    ],
-    coexists: ['microthrix', 'type0092'],
+    tags: ['pienienie', 'tłuszcze', 'lato'],
+    causes: ['Tłuszcze (FOG)', 'Długi wiek osadu', 'Ciepłe ścieki'],
+    action: ['Usuwanie piany', 'Skrócenie SRT'],
+    color: '#ff5266'
   },
   {
     id: 'microthrix',
     name: 'Microthrix parvicella',
-    alias: 'M. parvicella',
+    alias: 'Spaghetti / Mata',
     icon: '🍝',
-    color: '#00e5ff',
     danger: 'high',
-    dangerLabel: 'KRYTYCZNY',
-    tags: ['pienienie', 'puchnięcie', 'FOG'],
-    season: 'Zima (dominanta)',
-    temp: 'Niskie (< 12°C)',
-    problem: 'Pienienie + puchnięcie',
-    special: 'Splątane jak spaghetti',
-    summary: 'Zimowy dominat oczyszczalni. Wygląd pod mikroskopem: splątana mata spaghetti. Asymiluje długołańcuchowe kwasy tłuszczowe, wywołuje silne pienienie i puchnięcie osadu.',
-    morphology: [
-      { label: 'Forma', value: 'Długie, ciasno splątane nitki, tworzące kłębowisko (mata spaghetti)' },
-      { label: 'Barwienie', value: 'Gram-dodatnie, silnie kwasooporne (Neisser: niebieskie granulki PHB)' },
-      { label: 'Ruch', value: 'Brak' },
-      { label: 'Ściana komórkowa', value: 'Hydrofobowa, specyficzna dla LCFA' },
-      { label: 'Pod mikroskopem', value: 'Plątaniny nitek wychodzącej poza kłaczek — charakterystyczne "spaghetti"' },
-    ],
-    causes: [
-      'Niska temperatura ścieków (zima, < 12°C) — spowolnienie metabolizmu bakterii kłaczkotwórczych',
-      'Długi wiek osadu (SRT)',
-      'Długołańcuchowe kwasy tłuszczowe (LCFA) w ściekach',
-      'Niskie obciążenie osadu ładunkiem (niskie F/M)',
-      'Brak selektora biologicznego na dopływie',
-    ],
-    treatment: [
-      { urgent: true, text: 'Skrócenie SRT — kluczowa interwencja (M. parvicella potrzebuje długiego wieku biomasy)' },
-      { urgent: false, text: 'Usuwanie osadu ze zwiększoną częstotliwością zimą' },
-      { urgent: false, text: 'Redukcja FOG na dopływie (separator tłuszczów, preaeracja)' },
-      { urgent: false, text: 'Selektor biologiczny (strefa kontaktu z wysokim stężeniem substratu na wejściu)' },
-      { urgent: false, text: 'Dawkowanie chloru do recyrkulatu (ostrożnie, w dawkach nieeliminujących kłaczków)' },
-      { urgent: false, text: 'Zwiększenie DO > 2 mg/L w komorze napowietrzania' },
-    ],
-    coexists: ['nocardia', 'type0041', 'type0092'],
+    tags: ['pienienie', 'puchnięcie', 'tłuszcze', 'zima', 'fm'],
+    causes: ['Zima / Zimno', 'Tłuszcze (LCFA)', 'Niskie F/M'],
+    action: ['Skrócenie SRT', 'Sole glinu'],
+    color: '#00f2ff'
   },
   {
     id: 'type021n',
     name: 'Type 021N',
-    alias: 'Morfotyp 021N (Eikelboom)',
+    alias: 'Wskaźnik Azotu',
     icon: '🪣',
-    color: '#ff4455',
     danger: 'high',
-    dangerLabel: 'KRYTYCZNY',
-    tags: ['puchnięcie', 'siarka'],
-    season: 'Cały rok',
-    temp: 'Niezależne',
-    problem: 'Silne puchnięcie osadu',
-    special: 'Wskaźnik niedoboru N',
-    summary: 'Grube nitki z beczułkowatymi komórkami. Silny wskaźnik niedoboru biogenów (N) i septyczności ścieków. Wywołuje poważne puchnięcie utrudniające sedymentację.',
-    morphology: [
-      { label: 'Forma', value: 'Grube nitki z wyraźnie beczułkowatymi lub dyskowatymi komórkami' },
-      { label: 'Barwienie', value: 'Gram-ujemne, ziarnistości siarki po ekspozycji na H₂S' },
-      { label: 'Ruch', value: 'Ślizgający (gliding motility)' },
-      { label: 'Charakterystyka', value: 'Może magazynować siarkę, PHB i polifosforan' },
-      { label: 'Pod mikroskopem', value: 'Długie, proste nitki, wyraźne segmenty komórek, pochwa widoczna' },
-    ],
-    causes: [
-      'Niedobór azotu w ściekach — stosunek BZT₅:N < 100:5',
-      'Niedobór fosforu — BZT₅:P < 100:1',
-      'Septyczność ścieków — siarczki i lotne kwasy tłuszczowe w dopływie',
-      'Zagniwanie ścieków w kanalizacji lub zbiornikach pośrednich',
-      'Nagłe przeciążenia ładunkiem organicznym (high F/M pulsy)',
-    ],
-    treatment: [
-      { urgent: true, text: 'Kontrola biogenów: dawkowanie azotu (mocznik, RSM) i fosforu jeśli deficyt potwierdzony' },
-      { urgent: true, text: 'Eliminacja septyczności: napowietrzanie studzienek, dawkowanie azotanu wapnia do kolektora' },
-      { urgent: false, text: 'Dawkowanie chloru do recyrkulatu (selektywna eliminacja nitek)' },
-      { urgent: false, text: 'Selektor biologiczny (anaerob/anoksyczny) przed komorą napowietrzania' },
-      { urgent: false, text: 'Kontrola czasu retencji ścieków w sieci — unikanie zagniwania' },
-    ],
-    coexists: ['thiothrix', 'nostocoida'],
+    tags: ['puchnięcie', 'biogeny_n', 'siarka'],
+    causes: ['Brak Azotu', 'Septyczność (H2S)', 'VFA'],
+    action: ['Dawkowanie mocznika'],
+    color: '#ff5266'
   },
   {
     id: 'thiothrix',
     name: 'Thiothrix spp.',
-    alias: 'Morfotyp siarkowy',
+    alias: 'Bakteria Siarkowa',
     icon: '⚡',
-    color: '#7fff6a',
     danger: 'med',
-    dangerLabel: 'UMIARKOWANY',
-    tags: ['puchnięcie', 'siarka'],
-    season: 'Cały rok',
-    temp: 'Niezależne',
-    problem: 'Puchnięcie, mętny odpływ',
-    special: 'Magazynuje siarkę widoczną w komórkach',
-    summary: 'Nitki z prostokątnymi komórkami. Magazynują siarkę jako błyszczące granulki — widoczne pod mikroskopem bez barwienia. Marker septycznych, bogatych w siarczki ścieków.',
-    morphology: [
-      { label: 'Forma', value: 'Proste lub lekko wygięte nitki z prostokątnymi komórkami, pochwa' },
-      { label: 'Barwienie', value: 'Gram-ujemne, granulki siarki widoczne bez barwienia (refraktywne)' },
-      { label: 'Ruch', value: 'Brak lub słaby ślizgający' },
-      { label: 'Diagnostyczny marker', value: '⭐ Granulki siarki wewnątrzkomórkowe — widoczne jak "perły" w nicie' },
-      { label: 'Pod mikroskopem', value: 'Rozety na końcach nitek lub promieniście wychodzące z punktu (charakt. dla Thiothrix)' },
-    ],
-    causes: [
-      'Zagniwanie ścieków — wysokie stężenie siarczków H₂S',
-      'Niedotlenienie w reaktorze (DO < 1 mg/L)',
-      'Długi czas retencji w kanalizacji (ścieki przemysłowe, spożywcze)',
-      'Dopływ ścieków z fermentacji beztlenowej (np. odcieki z kompostowni, odciek z osadnika Imhoffa)',
-      'Obecność prostych substratów organicznych (lotne kwasy tłuszczowe)',
-    ],
-    treatment: [
-      { urgent: true, text: 'Eliminacja siarczków: napowietrzanie dopływu, dawkowanie FeCl₃ lub FeSO₄ (strącanie H₂S)' },
-      { urgent: false, text: 'Dawkowanie azotanu wapnia do kanalizacji (zapobieganie zagniwaniu)' },
-      { urgent: false, text: 'Poprawa DO w komorze napowietrzania (> 2 mg/L)' },
-      { urgent: false, text: 'Chlorowanie recyrkulatu przy nasilonej bulkingu' },
-      { urgent: false, text: 'Selektor z warunkami anoksycznymi (denitryfikacja usuwa prekursory)' },
-    ],
-    coexists: ['type021n', 'haliscomenobacter'],
+    tags: ['puchnięcie', 'tlen', 'siarka'],
+    causes: ['Siarczki (H2S)', 'Niskie DO'],
+    action: ['Napowietrzanie'],
+    color: '#2ecc71'
   },
   {
     id: 'type0041',
-    name: 'Type 0041',
-    alias: 'Morfotyp 0041 + Type 0675',
+    name: 'Type 0041 / 0675',
+    alias: 'Porośle Epifityczne',
     icon: '🌾',
-    color: '#00ccaa',
     danger: 'low',
-    dangerLabel: 'NISKI',
-    tags: ['niskie F/M'],
-    season: 'Cały rok',
-    temp: 'Niezależne',
-    problem: 'Rzadko poważne problemy',
-    special: 'Silne porośle epifityczne',
-    summary: 'Nitki z kwadratowymi komórkami i bujnym porostem epifitycznym (inne mikroorganizmy przyczepione do nitki). Sygnał niskiego obciążenia — osad "dobrze odżywiony, ale nie za bardzo".',
-    morphology: [
-      { label: 'Forma', value: 'Nitki z kwadratowymi komórkami; Type 0675 ma komórki mniejsze, bardziej kwadratowe' },
-      { label: 'Barwienie', value: 'Gram-ujemne, Neisser-ujemne' },
-      { label: 'Charakterystyka', value: '⭐ Porośle epifityczne — inne mikroorg. przytwierdzają się do nitki jak "futro"' },
-      { label: 'Pod mikroskopem', value: 'Nitki z "brodą" — epifity tworzą charakterystyczne futro dookoła nitki' },
-    ],
-    causes: [
-      'Niskie obciążenie osadu ładunkiem (niski wskaźnik F/M)',
-      'Długi wiek osadu (SRT)',
-      'Stabilne warunki eksploatacyjne bez przeciążeń — stała, chroniczna "głodówka"',
-      'Często w oczyszczalniach o wysokim stopniu stabilizacji',
-    ],
-    treatment: [
-      { urgent: false, text: 'Zwiększenie F/M — zmiana dawkowania, przyjęcie większych ładunków' },
-      { urgent: false, text: 'Skrócenie SRT' },
-      { urgent: false, text: 'Typ 0041 rzadko wymaga interwencji; monitorowanie wystarczające' },
-      { urgent: false, text: 'Przy nasileniu — selektor biologiczny z pulsowym podawaniem substratu' },
-    ],
-    coexists: ['microthrix', 'type1851'],
+    tags: ['fm'],
+    causes: ['Niskie F/M', 'Stary osad'],
+    action: ['Zwiększenie obciążenia'],
+    color: '#94a3b8'
   },
   {
     id: 'sphaerotilus',
     name: 'Sphaerotilus natans',
-    alias: '+ Type 1701',
+    alias: 'Fałszywe rozgałęzienia',
     icon: '🌭',
-    color: '#ff9944',
     danger: 'high',
-    dangerLabel: 'KRYTYCZNY',
-    tags: ['puchnięcie'],
-    season: 'Cały rok (szczyt: lato)',
-    temp: 'Ciepłe (> 15°C)',
-    problem: 'Poważne puchnięcie osadu',
-    special: 'Fałszywe rozgałęzienia + pochwa',
-    summary: 'Klasyczny sprawca puchnięcia osadu przy wysokim obciążeniu lub niedotlenieniu. Komórki jak pręciki/kiełbaski, wyraźna pochwa, fałszywe rozgałęzienia. Type 1701 — bliski krewny.',
-    morphology: [
-      { label: 'Forma', value: 'Nitki z komórkami pałeczkowatymi lub kiełbaskopodobnymi, wyraźna pochwa (sheath)' },
-      { label: 'Barwienie', value: 'Gram-ujemne, pochwa Gram-dodatnia' },
-      { label: 'Rozgałęzienia', value: 'Fałszywe rozgałęzienia — wynik "wyślizgania" komórek z pochwy' },
-      { label: 'Pod mikroskopem', value: 'Widoczne pochwy (jako puste "rury") po odejściu komórek; charakterystyczne fałszywe rozwidlenia' },
-    ],
-    causes: [
-      'Bardzo niskie stężenie tlenu rozpuszczonego (DO < 0.5 mg/L)',
-      'Silne przeciążenie oczyszczalni łatwo przyswajalnymi substancjami (wysokie BZT, glukoza, octany)',
-      'Nagłe szoki ładunkowe (np. wrzutki przemysłowe)',
-      'Deficyt mikroelementów (Fe, Mn)',
-      'Wysokie F/M + niskie DO — "podwójny problem"',
-    ],
-    treatment: [
-      { urgent: true, text: 'Natychmiastowe zwiększenie napowietrzania (cel: DO > 2 mg/L)' },
-      { urgent: true, text: 'Identyfikacja i eliminacja źródła przeciążenia — monitoring dopływu' },
-      { urgent: false, text: 'Chlorowanie recyrkulatu (dawka selektywna: 2–5 mg Cl₂/g MLSS)' },
-      { urgent: false, text: 'Selektor biologiczny — anaerob lub anoksyczny przed komorą tlenową' },
-      { urgent: false, text: 'Dawkowanie mikroelementów (Fe, Mn, Co) jeśli deficyt potwierdzony' },
-      { urgent: false, text: 'Kontrola i wyrównanie ładunków dopływowych (bufor uśredniający)' },
-    ],
-    coexists: ['haliscomenobacter', 'type1701'],
+    tags: ['puchnięcie', 'tlen', 'lato'],
+    causes: ['Bardzo niski tlen', 'Wysokie BZT'],
+    action: ['Silne napowietrzanie'],
+    color: '#ff9f43'
   },
   {
     id: 'type0092',
     name: 'Type 0092',
-    alias: 'Morfotyp 0092',
-    icon: '🌡',
-    color: '#ffcc00',
+    alias: 'Letni nitkowiec',
+    icon: '☀️',
     danger: 'med',
-    dangerLabel: 'UMIARKOWANY',
-    tags: ['FOG', 'puchnięcie'],
-    season: 'Lato',
-    temp: 'Ciepłe (> 18°C)',
-    problem: 'Puchnięcie, mętny odpływ',
-    special: 'Wewnątrz kłaczka, krótkie nitki',
-    summary: 'Krótkie, wygięte nitki rosnące wewnątrz kłaczka — typowo niewidoczne "na zewnątrz". Podobny do M. parvicella pod kątem metabolizmu tłuszczów, ale dominuje w lecie (> 18°C).',
-    morphology: [
-      { label: 'Forma', value: 'Krótkie, wygięte lub spiralnie skręcone nitki, rosną wewnątrz kłaczka' },
-      { label: 'Barwienie', value: 'Gram-ujemne' },
-      { label: 'Charakterystyka', value: 'Rzadko wystaje poza kłaczek — trudny do wykrycia przy małym nasileniu' },
-      { label: 'Pod mikroskopem', value: 'Krótkie "przecinki" lub "krótkie wężyki" w środku kłaczka' },
-    ],
-    causes: [
-      'Wysoka temperatura ścieków (> 18°C) — sezon letni',
-      'Tłuszcze i lipidy w ściekach (podobnie jak M. parvicella)',
-      'Długi wiek osadu',
-      'Niskie obciążenie (niski F/M)',
-    ],
-    treatment: [
-      { urgent: false, text: 'Redukcja SRT (skrócenie wieku osadu)' },
-      { urgent: false, text: 'Redukcja FOG na dopływie' },
-      { urgent: false, text: 'Zwiększenie F/M (większy dopływ ładunku lub mniejsza masa osadu)' },
-      { urgent: false, text: 'Monitorowanie sezonowe — problem ustępuje przy ochłodzeniu' },
-    ],
-    coexists: ['nocardia', 'microthrix'],
+    tags: ['tłuszcze', 'lato', 'fm'],
+    causes: ['Ciepło (>18°C)', 'Tłuszcze', 'Długi SRT'],
+    action: ['Skrócenie SRT'],
+    color: '#ffcc00'
   },
   {
     id: 'haliscomenobacter',
-    name: 'Haliscomenobacter hydrossis',
-    alias: 'H. hydrossis',
+    name: 'H. hydrossis',
+    alias: 'Wykałaczki',
     icon: '📍',
-    color: '#d966ff',
     danger: 'med',
-    dangerLabel: 'UMIARKOWANY',
-    tags: ['niskie F/M'],
-    season: 'Cały rok',
-    temp: 'Niezależne',
-    problem: 'Puchnięcie przy DO-deficycie',
-    special: 'Wykałaczki promieniście z kłaczka',
-    summary: 'Bardzo cienkie, proste nitki wychodzące promieniście z kłaczka jak wykałaczki. Precyzyjny wskaźnik deficytu tlenu rozpuszczonego — "monitor DO" w osadzie.',
-    morphology: [
-      { label: 'Forma', value: 'Bardzo cienkie (< 1 µm), proste nitki, bez wyraźnych komórek pod mikroskopem świetlnym' },
-      { label: 'Barwienie', value: 'Gram-ujemne, Neisser-ujemne' },
-      { label: 'Układ', value: '⭐ Promieniście wychodzące z kłaczka — jak igły jeża lub wykałaczki z bułki' },
-      { label: 'Pod mikroskopem', value: 'Kłaczek z "koroną" cienkich, ostrych nitek. Bardzo charakterystyczny widok.' },
-    ],
-    causes: [
-      'Niedobór tlenu rozpuszczonego w komorze napowietrzania (DO < 1.0 mg/L)',
-      'Dysfunkcja napowietrzania (zatkane dyfuzory, zbyt niska moc dmuchaw)',
-      'Przeciążenie reaktora ładunkiem (spadek DO wskutek wysokiego poboru tlenu)',
-      'Niskie obciążenie F/M (warunki tła)',
-    ],
-    treatment: [
-      { urgent: true, text: 'Zwiększenie napowietrzania — cel: DO > 2 mg/L stale (nie chwilowo!)' },
-      { urgent: true, text: 'Sprawdzenie i czyszczenie dyfuzorów — pomiar rozkładu DO w reaktorze' },
-      { urgent: false, text: 'Regulacja SRT i stężenia MLSS jeśli nadmierna biomasa powoduje niedobór O₂' },
-      { urgent: false, text: 'Przy masowym zakwicie — chlorowanie recyrkulatu' },
-    ],
-    coexists: ['thiothrix', 'sphaerotilus'],
-  },
-  {
-    id: 'type1851',
-    name: 'Type 1851',
-    alias: 'Morfotyp 1851',
-    icon: '🔩',
-    color: '#ff44aa',
-    danger: 'low',
-    dangerLabel: 'NISKI',
-    tags: ['niskie F/M'],
-    season: 'Cały rok',
-    temp: 'Niezależne',
-    problem: 'Rzadko poważny',
-    special: 'Indykator niedociążenia',
-    summary: 'Mniej opisany morfotyp, pojawiający się przy niskim obciążeniu F/M. Rzadko powoduje poważne problemy eksploatacyjne, ale sygnalizuje zbyt stary osad.',
-    morphology: [
-      { label: 'Forma', value: 'Nitki o średniej grubości, komórki cylindryczne' },
-      { label: 'Barwienie', value: 'Gram-ujemne' },
-      { label: 'Charakterystyka', value: 'Brak charakterystycznego porośla lub ziarnistości siarki' },
-      { label: 'Pod mikroskopem', value: 'Morfologicznie niespecyficzny — diagnoza przez kontekst warunków procesowych' },
-    ],
-    causes: [
-      'Niskie obciążenie osadu (niski F/M)',
-      'Bardzo długi wiek osadu (SRT > 20 dni)',
-      'Stabilne, niezmienne warunki procesowe przez długi czas',
-    ],
-    treatment: [
-      { urgent: false, text: 'Zwiększenie F/M' },
-      { urgent: false, text: 'Skrócenie SRT' },
-      { urgent: false, text: 'Monitorowanie — zwykle brak konieczności interwencji' },
-    ],
-    coexists: ['type0041'],
+    tags: ['tlen'],
+    causes: ['Niskie DO (chronicznie)'],
+    action: ['Zwiększenie DO > 2'],
+    color: '#bf5af2'
   },
   {
     id: 'nostocoida',
     name: 'Nostocoida limicola',
-    alias: 'Grupa Nostocoida',
+    alias: 'Korale',
     icon: '🫧',
-    color: '#64c8ff',
     danger: 'med',
-    dangerLabel: 'UMIARKOWANY',
-    tags: ['pienienie', 'puchnięcie'],
-    season: 'Cały rok',
-    temp: 'Niezależne',
-    problem: 'Pienienie + puchnięcie',
-    special: 'Reaguje na kwasy lotne + deficyt N/P',
-    summary: 'Heterogenna grupa morfologicznie zbliżonych organizmów. Wywołuje pienienie i puchnięcie przy niedoborach nutrientów i obecności lotnych kwasów tłuszczowych (VFA).',
-    morphology: [
-      { label: 'Forma', value: 'Zaokrąglone lub owalne komórki układające się w skręcone nitki' },
-      { label: 'Barwienie', value: 'Gram-dodatnie lub zmienne, Neisser-dodatnie' },
-      { label: 'Charakterystyka', value: 'Komórki wyglądają jak "korale" lub "kulki na sznurku"' },
-      { label: 'Pod mikroskopem', value: 'Skręcone nitki z wyraźnie widocznymi, okrągłymi komórkami' },
-    ],
-    causes: [
-      'Niedobory azotu i fosforu (niski stosunek BZT:N:P)',
-      'Obecność lotnych kwasów tłuszczowych (VFA) w dopływie',
-      'Dopływ ścieków z fermentacji lub przemysłu spożywczego',
-      'Niskie obciążenie przy jednoczesnym deficycie nutrientów',
-    ],
-    treatment: [
-      { urgent: false, text: 'Uzupełnienie biogenów: azot (mocznik, RSM) i fosfor (H₃PO₄, Trifosforan)' },
-      { urgent: false, text: 'Kontrola i redukcja VFA w dopływie' },
-      { urgent: false, text: 'Chlorowanie recyrkulatu przy silnym puchnięciu' },
-      { urgent: false, text: 'Kontrola bilansu nutrientów — regularne badania BZT:N:P' },
-    ],
-    coexists: ['type021n', 'type0041'],
-  },
+    tags: ['pienienie', 'biogeny_n', 'biogeny_p'],
+    causes: ['Brak Fosforu/Azotu', 'Kwasy lotne'],
+    action: ['Biogeny'],
+    color: '#64c8ff'
+  }
 ];
 
-// Co-occurrence edges
-const edges = [
-  { from: 'nocardia', to: 'microthrix', weight: 3, label: 'FOG + długi SRT' },
-  { from: 'nocardia', to: 'type0092', weight: 2, label: 'FOG + ciepło' },
-  { from: 'microthrix', to: 'type0041', weight: 2, label: 'Niskie F/M' },
-  { from: 'type021n', to: 'thiothrix', weight: 3, label: 'Septyczność + siarczki' },
-  { from: 'type021n', to: 'nostocoida', weight: 2, label: 'Deficyt N/P' },
-  { from: 'thiothrix', to: 'haliscomenobacter', weight: 2, label: 'Niedotlenienie' },
-  { from: 'sphaerotilus', to: 'haliscomenobacter', weight: 2, label: 'Niskie DO' },
-  { from: 'type0041', to: 'type1851', weight: 3, label: 'Niskie F/M' },
-  { from: 'microthrix', to: 'type0092', weight: 2, label: 'FOG' },
-  { from: 'nostocoida', to: 'type0041', weight: 1, label: 'Deficyt nutrientów' },
-];
+let activeScannerTags = new Set();
+let currentFontSize = 16;
 
-// Matrix data
-const conditions = ['Niskie F/M','Długi SRT','FOG (tłuszcze)','Niedotlenienie (DO↓)','Septyczność (H₂S)','Deficyt N/P','Niska temp.','Wysoka temp.','Wysokie BZT'];
-const matrixData = {
-  'nocardia':          [0,2,3,0,0,0,1,2,0],
-  'microthrix':        [2,3,3,0,0,0,3,0,0],
-  'type021n':          [0,0,0,1,2,3,0,0,2],
-  'thiothrix':         [0,0,0,2,3,1,0,0,0],
-  'type0041':          [3,2,0,0,0,1,0,0,0],
-  'sphaerotilus':      [0,0,0,3,0,0,0,2,3],
-  'type0092':          [1,2,2,0,0,0,0,3,0],
-  'haliscomenobacter': [1,0,0,3,0,0,0,0,1],
-  'type1851':          [3,3,0,0,0,0,0,0,0],
-  'nostocoida':        [1,1,0,0,1,3,0,0,1],
-};
+// === SCANNER LOGIC ===
 
-// ========== RENDER CARDS ==========
-function renderCards(filter = 'all') {
-  const grid = document.getElementById('cards-grid');
-  grid.innerHTML = '';
-  bacteria.forEach(b => {
-    if (filter !== 'all' && !b.tags.includes(filter)) return;
-    const card = document.createElement('div');
-    card.className = 'bact-card';
-    card.dataset.id = b.id;
+function toggleScan(tag, el) {
+  if (activeScannerTags.has(tag)) {
+    activeScannerTags.delete(tag);
+    el.classList.remove('active');
+  } else {
+    activeScannerTags.add(tag);
+    el.classList.add('active');
+  }
+  runScanner();
+}
 
-    card.innerHTML = `
+function runScanner() {
+  const resultDiv = document.getElementById('scan-results');
+  if (activeScannerTags.size === 0) {
+    resultDiv.innerHTML = '<div class="empty-state">Wybierz parametry powyżej, aby rozpocząć skanowanie osadu.</div>';
+    return;
+  }
+
+  const matches = data.map(b => {
+    const matchCount = Array.from(activeScannerTags).filter(t => b.tags.includes(t)).length;
+    return { ...b, score: matchCount };
+  }).filter(b => b.score > 0).sort((a, b) => b.score - a.score);
+
+  if (matches.length === 0) {
+    resultDiv.innerHTML = '<div class="empty-state">Nie znaleziono gatunku pasującego do tych specyficznych warunków. Spróbuj zmienić filtry.</div>';
+    return;
+  }
+
+  resultDiv.innerHTML = matches.map(b => `
+    <div class="card">
       <div class="card-header">
-        <div class="card-icon" style="background:${b.color}22;border:1px solid ${b.color}44">${b.icon}</div>
-        <div class="card-name">
-          <h3 style="color:${b.color}">${b.name}</h3>
-          <div class="card-alias">${b.alias}</div>
+        <div class="bact-icon">${b.icon}</div>
+        <div class="bact-info">
+          <h3>${b.name}</h3>
+          <p>${b.alias} • Dopasowanie: ${Math.round((b.score / activeScannerTags.size) * 100)}%</p>
         </div>
-        <div class="danger-badge danger-${b.danger === 'high' ? 'high' : b.danger === 'med' ? 'med' : 'low'}">${b.dangerLabel}</div>
-      </div>
-      <div class="card-summary">${b.summary}</div>
-      <div class="card-quick">
-        <span class="quick-tag qt-temp">🌡 ${b.temp}</span>
-        <span class="quick-tag qt-season">📅 ${b.season}</span>
-        <span class="quick-tag qt-problem">⚠️ ${b.problem}</span>
-        <span class="quick-tag qt-special">✦ ${b.special}</span>
-      </div>
-      <button class="card-expand-btn" onclick="toggleCard('${b.id}', event)">▼ Rozwiń pełną diagnostykę</button>
-      <div class="card-detail" id="detail-${b.id}">
-        <div class="detail-section">
-          <h4>🔬 Morfologia / Jak rozpoznać</h4>
-          ${b.morphology.map(m => `<div class="diag-row"><span class="diag-label">${m.label}</span><span class="diag-value">${m.value}</span></div>`).join('')}
-        </div>
-        <div class="detail-section">
-          <h4>⚡ Przyczyny / Warunki sprzyjające</h4>
-          <ul class="cause-list">${b.causes.map(c => `<li>${c}</li>`).join('')}</ul>
-        </div>
-        <div class="detail-section">
-          <h4>💊 Działania korekcyjne / Leczenie</h4>
-          <ul class="treatment-list">${b.treatment.map(t => `<li${t.urgent ? ' class="urgent"' : ''}>${t.urgent ? '🚨 PILNE: ' : ''}${t.text}</li>`).join('')}</ul>
-        </div>
-        <div class="detail-section">
-          <h4>🕸 Często współwystępuje z</h4>
-          <div>${b.coexists.map(id => {
-            const co = bacteria.find(x => x.id === id);
-            return co ? `<span class="coexist-tag" style="color:${co.color};border-color:${co.color}44">${co.icon} ${co.name}</span>` : '';
-          }).join('')}</div>
+        <div class="status-tag ${b.score === activeScannerTags.size ? 'status-high' : ''}">
+          ${b.score === activeScannerTags.size ? 'IDEALNE' : 'MOŻLIWE'}
         </div>
       </div>
-    `;
-    grid.appendChild(card);
-  });
+      <div style="margin-top:10px; font-size:12px; color:var(--text-dim)">
+        <strong>Główny powód:</strong> ${b.causes.join(', ')}
+      </div>
+    </div>
+  `).join('');
 }
 
-function toggleCard(id, e) {
-  e.stopPropagation();
-  const detail = document.getElementById('detail-' + id);
-  const btn = detail.previousElementSibling;
-  const card = detail.closest('.bact-card');
-  const isOpen = detail.classList.contains('open');
-  detail.classList.toggle('open');
-  card.classList.toggle('expanded');
-  btn.textContent = isOpen ? '▼ Rozwiń pełną diagnostykę' : '▲ Zwiń';
+// === UTILS ===
+
+function switchView(view, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('current-view-title').innerText = '// ' + view.toUpperCase();
 }
 
-function filterCards(tag, el) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+function toggleSettings() { document.getElementById('accessMenu').classList.toggle('open'); }
+function toggleTheme() { document.body.classList.toggle('light-mode'); }
+function adjustFont(delta) {
+  currentFontSize = Math.max(14, Math.min(22, currentFontSize + delta));
+  document.documentElement.style.setProperty('--base-font-size', currentFontSize + 'px');
+}
+
+function filterBact(tag, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
-  renderCards(tag);
+  renderCatalog(tag);
 }
 
-// ========== RENDER SVG MAP ==========
-function renderMap() {
-  const svg = document.getElementById('cooccurrence-svg');
-  const W = 800, H = 480;
-
-  const positions = {
-    nocardia:          { x: 200, y: 100 },
-    microthrix:        { x: 380, y: 80 },
-    type021n:          { x: 620, y: 130 },
-    thiothrix:         { x: 680, y: 280 },
-    type0041:          { x: 130, y: 280 },
-    sphaerotilus:      { x: 520, y: 380 },
-    type0092:          { x: 320, y: 230 },
-    haliscomenobacter: { x: 480, y: 240 },
-    type1851:          { x: 100, y: 400 },
-    nostocoida:        { x: 700, y: 400 },
-  };
-
-  const colorMap = {};
-  bacteria.forEach(b => colorMap[b.id] = b.color);
-
-  let svgContent = '';
-
-  // Edges
-  edges.forEach(e => {
-    const a = positions[e.from], b = positions[e.to];
-    const w = e.weight;
-    svgContent += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" 
-      stroke="${colorMap[e.from]}" stroke-width="${w * 0.8}" stroke-opacity="${0.25 + w*0.1}"
-      stroke-dasharray="${w === 3 ? 'none' : '6,4'}">
-      <title>${e.label}</title>
-    </line>`;
-  });
-
-  // Nodes
-  bacteria.forEach(b => {
-    const p = positions[b.id];
-    svgContent += `
-      <g class="node" data-id="${b.id}" style="cursor:pointer" onclick="highlightNode('${b.id}')">
-        <circle cx="${p.x}" cy="${p.y}" r="30" fill="${b.color}22" stroke="${b.color}" stroke-width="1.5"/>
-        <text x="${p.x}" y="${p.y - 4}" text-anchor="middle" font-size="18" dominant-baseline="middle">${b.icon}</text>
-        <text x="${p.x}" y="${p.y + 16}" text-anchor="middle" font-size="9" fill="${b.color}" font-family="Inter, sans-serif">${b.name.split(' ')[0]}</text>
-        <text x="${p.x}" y="${p.y + 25}" text-anchor="middle" font-size="8" fill="${b.color}88" font-family="Inter, sans-serif">${b.name.split(' ')[1] || ''}</text>
-      </g>`;
-  });
-
-  svg.innerHTML = svgContent;
+function renderCatalog(tag = 'all') {
+  const list = document.getElementById('bacteria-list');
+  list.innerHTML = data.filter(b => tag === 'all' || b.tags.includes(tag)).map(b => `
+    <div class="card" onclick="this.querySelector('.expanded').classList.toggle('open')">
+      <div class="card-header">
+        <div class="bact-icon">${b.icon}</div>
+        <div class="bact-info"><h3>${b.name}</h3><p>${b.alias}</p></div>
+      </div>
+      <div class="expanded" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--border)">
+        <p style="font-size:13px">${b.morph}</p>
+      </div>
+    </div>
+  `).join('');
 }
 
-function highlightNode(id) {
-  showTab('diagnoza');
-  setTimeout(() => {
-    const card = document.querySelector(`[data-id="${id}"]`);
-    if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      card.style.borderColor = bacteria.find(b => b.id === id)?.color || '#00e5ff';
-      setTimeout(() => card.style.borderColor = '', 2000);
-    }
-  }, 100);
-}
-
-// ========== RENDER MATRIX ==========
 function renderMatrix() {
   const table = document.getElementById('matrix-table');
-  let html = '<thead><tr><th>Gatunek</th>';
-  conditions.forEach(c => {
-    html += `<th>${c}</th>`;
-  });
+  const headers = ['Gatunek', 'Tlen ↓', 'FOG', 'F/M ↓', 'H2S'];
+  let html = '<thead><tr>';
+  headers.forEach(h => html += `<th>${h}</th>`);
   html += '</tr></thead><tbody>';
-
-  bacteria.forEach(b => {
-    const row = matrixData[b.id];
-    html += `<tr><td class="m-name" style="color:${b.color}">${b.icon} ${b.name}</td>`;
-    row.forEach(v => {
-      const cls = v === 3 ? 'm-yes' : v === 2 ? 'm-maybe' : v === 1 ? 'm-maybe' : 'm-no';
-      html += `<td><span class="m-dot ${cls}" title="${v === 3 ? 'Silne' : v >= 1 ? 'Umiarkowane' : 'Brak'}"></span></td>`;
-    });
-    html += '</tr>';
+  data.forEach(b => {
+    html += `<tr>
+      <td style="font-weight:800; color:${b.color}">${b.icon} ${b.name.split(' ')[0]}</td>
+      <td>${b.tags.includes('tlen') ? '●' : '—'}</td>
+      <td>${b.tags.includes('tłuszcze') ? '●' : '—'}</td>
+      <td>${b.tags.includes('fm') ? '●' : '—'}</td>
+      <td>${b.tags.includes('siarka') ? '●' : '—'}</td>
+    </tr>`;
   });
-  html += '</tbody>';
   table.innerHTML = html;
 }
 
-// ========== TABS ==========
-function showTab(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  const idx = ['diagnoza','mapa','matryca'].indexOf(id);
-  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
-}
-
-// ========== THEME & FONT ==========
-function setFont(mode) {
-  document.body.classList.toggle('dyslexic', mode === 'dyslexic');
-  document.getElementById('btn-lexend').classList.toggle('active', mode === 'lexend');
-  document.getElementById('btn-dyslexic').classList.toggle('active', mode === 'dyslexic');
-}
-
-function setTheme(theme) {
-  document.body.classList.toggle('light', theme === 'light');
-  document.getElementById('btn-dark').classList.toggle('active', theme === 'dark');
-  document.getElementById('btn-light').classList.toggle('active', theme === 'light');
-}
-
-function setFontSize(size) {
-  document.body.style.fontSize = size + 'px';
-  document.getElementById('font-size-display').textContent = size + 'px';
-}
-
-// ========== INIT ==========
-renderCards();
-renderMap();
-renderMatrix();
+window.onload = () => { renderCatalog(); renderMatrix(); };
 </script>
 </body>
 </html>
