@@ -1,0 +1,157 @@
+<style>
+  :root {
+    --bg: #0a0e14;
+    --surface: #111620;
+    --surface2: #161d2a;
+    --border: #1e2d45;
+    --accent: #00b8d4;
+    --accent2: #ff6b35;
+    --accent3: #7fff6a;
+    --accent-glow: rgba(0, 184, 212, 0.15);
+    --text: #c8d8e8;
+    --text-dim: #7a94ad;
+    --text-bright: #ffffff;
+    --glass: rgba(17, 22, 32, 0.8);
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  body.light {
+    --bg: #f4f7fa;
+    --surface: #ffffff;
+    --surface2: #f0f4f8;
+    --border: #d1d9e6;
+    --accent: #0077aa;
+    --text: #2e3c4a;
+    --text-dim: #5c6d7e;
+    --text-bright: #0a1828;
+    --glass: rgba(255, 255, 255, 0.9);
+    --card-shadow: 0 8px 24px rgba(149, 157, 165, 0.2);
+  }
+
+  /* --- GLOBAL REFINEMENTS --- */
+  body {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background-attachment: fixed;
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(0, 184, 212, 0.03) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(255, 107, 53, 0.03) 0%, transparent 40%);
+  }
+
+  /* --- GLASS HEADER --- */
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 40px 60px;
+    border-radius: 0 0 40px 40px;
+    box-shadow: var(--card-shadow);
+  }
+
+  body.light .header {
+    background: linear-gradient(135deg, #0077aa 0%, #00aaff 100%);
+  }
+
+  .header h1 {
+    font-size: 32px;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  }
+
+  /* --- MODERN TABS --- */
+  .tabs {
+    justify-content: center;
+    gap: 10px;
+    border: none;
+    margin-top: -25px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .tab-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: var(--card-shadow);
+  }
+
+  .tab-btn.active {
+    background: var(--accent);
+    color: white;
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+
+  /* --- ENHANCED CARDS --- */
+  .bact-card {
+    background: var(--glass);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .bact-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: var(--accent);
+    box-shadow: 0 15px 45px rgba(0, 184, 212, 0.2);
+  }
+
+  .card-header {
+    border-bottom: 1px solid rgba(122, 148, 173, 0.1);
+    padding: 20px;
+  }
+
+  .card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    font-size: 28px;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+  }
+
+  /* --- DANGER BADGES --- */
+  .danger-badge {
+    border-radius: 50px;
+    padding: 4px 12px;
+    font-size: 10px;
+  }
+
+  /* --- CONTROLS --- */
+  .controls-bar {
+    border-radius: 15px;
+    margin: 20px 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .theme-btn {
+    border-radius: 8px;
+  }
+
+  /* --- NEON ACCENTS FOR BACTERIA --- */
+  .bact-card[data-id="nocardia"] { border-left: 4px solid var(--accent2); }
+  .bact-card[data-id="microthrix"] { border-left: 4px solid var(--accent); }
+  .bact-card[data-id="type021n"] { border-left: 4px solid var(--red); }
+
+  /* --- ANIMATIONS --- */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .bact-card {
+    animation: fadeInUp 0.5s ease backwards;
+  }
+
+  /* Staggering animation for cards */
+  .bact-card:nth-child(1) { animation-delay: 0.1s; }
+  .bact-card:nth-child(2) { animation-delay: 0.2s; }
+  .bact-card:nth-child(3) { animation-delay: 0.3s; }
+</style>
